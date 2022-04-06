@@ -2,11 +2,16 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
+
+	"github.com/fatih/color"
 )
 
 // Page holds all the information we need to generate a new
@@ -24,6 +29,9 @@ type File struct {
 	DirPath  string
 }
 
+var generatedFilesCount int = 0
+var bytesGenerated int64 = 0
+
 func main() {
 	filename := flag.String("file", "", "Name of a text file in the current directory.")
 	dirpath := flag.String("dir", "./", "A path to a directory containing text files.")
@@ -35,6 +43,25 @@ func main() {
 	}
 
 	generateSiteFromDir(*dirpath)
+	printSuccessMessage()
+}
+
+func printSuccessMessage() {
+	white := color.New(color.FgWhite)
+	green := color.New(color.FgGreen)
+	boldGreen := green.Add(color.Bold)
+
+	outputSize := fmt.Sprintf("(%.1fkB) total.", float64(bytesGenerated)/1000)
+
+	// generate size for banner by generatedFilesCount char length
+	banner := strings.Repeat("-", 29+len(strconv.Itoa(generatedFilesCount))+len(outputSize))
+
+	white.Print(banner + " \n")
+	boldGreen.Print(" Success! ")
+	fmt.Print("Generated ")
+	boldGreen.Printf("%d ", generatedFilesCount)
+	fmt.Printf("pages " + outputSize + "\n")
+	white.Print(banner + " \n")
 }
 
 func generateSiteFromDir(dirpath string) {
@@ -109,4 +136,12 @@ func generatePageFromFile(dirpath string, filename string, extension string) {
 	// Furthermore, upon execution, the rendered template will be
 	// saved inside the new file we created earlier.
 	t.Execute(newFile, page)
+
+	// Get size of new file
+	fileStat, err := newFile.Stat()
+	if err != nil {
+		panic(err)
+	}
+	bytesGenerated += fileStat.Size()
+	generatedFilesCount += 1
 }
