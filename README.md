@@ -58,7 +58,7 @@ If you get stuck on any step, be sure to print the output to `stdout`!
 - [x] **Add, commit, and push to GitHub**.
 - [x] Add a new flag to your command named `file`. This flag represents the name of any `.txt` file in the same directory as your program. Run `./makesite --file=latest-post.txt` to test.
 - [x] Update the `save` function to use the input filename to generate a new HTML file. For example, if the input file is named `latest-post.txt`, the generated HTML file should be named `latest-post.html`.
-- [ ] **Add, commit, and push to GitHub**.
+- [x] **Add, commit, and push to GitHub**.
 
 #### v1.0 Stretch Challenges
 
