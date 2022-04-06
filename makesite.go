@@ -21,6 +21,7 @@ type Page struct {
 type File struct {
 	FileName string
 	FilePath string
+	DirPath  string
 }
 
 func main() {
@@ -29,7 +30,7 @@ func main() {
 	flag.Parse()
 
 	if *filename != "" {
-		generatePageFromFile("./"+*filename, *filename, "txt")
+		generatePageFromFile("./", *filename, ".txt")
 		return
 	}
 
@@ -37,10 +38,10 @@ func main() {
 }
 
 func generateSiteFromDir(dirpath string) {
-	textFilesInDir := getTextFilesInDirectory(dirpath, "txt")
+	textFilesInDir := getTextFilesInDirectory(dirpath, ".txt")
 
 	for _, file := range textFilesInDir {
-		generatePageFromFile(file.FilePath, file.FileName, "")
+		generatePageFromFile(file.DirPath, file.FileName, "")
 	}
 }
 
@@ -53,20 +54,24 @@ func getTextFilesInDirectory(dirpath string, extension string) []File {
 
 	var textFiles []File
 	for _, file := range files {
-		if filepath.Ext(file.Name()) == "."+extension {
+		if filepath.Ext(file.Name()) == extension {
+
 			filePath := dirpath + file.Name()
+
 			fileInfo := File{
 				FileName: file.Name(),
 				FilePath: filePath,
+				DirPath:  dirpath,
 			}
+
 			textFiles = append(textFiles, fileInfo)
 		}
 
 		// get files recursively
-		// if file.IsDir() {
-		// 	filesInSubDir := getTextFilesInDirectory(dirpath + "/" + file.Name())
-		// 	textFiles = append(textFiles, filesInSubDir...)
-		// }
+		if file.IsDir() {
+			filesInSubDir := getTextFilesInDirectory(dirpath+file.Name()+"/", ".txt")
+			textFiles = append(textFiles, filesInSubDir...)
+		}
 	}
 
 	return textFiles
@@ -74,11 +79,9 @@ func getTextFilesInDirectory(dirpath string, extension string) []File {
 
 // Take a file path and save that file's contents as a new html post
 func generatePageFromFile(dirpath string, filename string, extension string) {
-	fileContents, err := ioutil.ReadFile(dirpath + extension)
+	// Check if parent directory exists at output dirpath yet
+	fileContents, err := ioutil.ReadFile(dirpath + filename + extension)
 	if err != nil {
-		// A common use of `panic` is to abort if a function returns an error
-		// value that we don’t know how to (or want to) handle. This example
-		// panics if we get an unexpected error when creating a new file.
 		panic(err)
 	}
 	outputFilePath := "./output/" + filename + ".html"
