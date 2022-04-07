@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ .Title }}</title>
+  </head>
+  <body>
+    <ul>
+        {{ with .Pages }}
+          {{ range . }}
+            <li>
+                <div><a href="../{{ .HTMLPagePath }}" >{{ .TextFileName }}</a></div>
+            </li>
+          {{ end }}
+        {{ end }}
+    </ul>
+  </body>
+</html>

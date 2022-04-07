@@ -29,6 +29,12 @@ type File struct {
 	DirPath  string
 }
 
+type PageList struct {
+	HTMLPagePath string
+	Title        string
+	Pages        []Page
+}
+
 var generatedFilesCount int = 0
 var bytesGenerated int64 = 0
 
@@ -65,14 +71,19 @@ func printSuccessMessage() {
 }
 
 func generateSiteFromDir(dirpath string) {
-	textFilesInDir := getTextFilesInDirectory(dirpath, ".txt")
+	textFilesInDir := getFilesInDirectory(dirpath, ".txt")
+	var pages []Page
 
 	for _, file := range textFilesInDir {
-		generatePageFromFile(file.DirPath, file.FileName, "")
+		pages = append(
+			pages,
+			generatePageFromFile(file.DirPath, file.FileName, ""),
+		)
 	}
+	generateHomePage(pages, "Home")
 }
 
-func getTextFilesInDirectory(dirpath string, extension string) []File {
+func getFilesInDirectory(dirpath string, extension string) []File {
 	directory := dirpath
 	files, err := ioutil.ReadDir(directory)
 	if err != nil {
@@ -96,7 +107,7 @@ func getTextFilesInDirectory(dirpath string, extension string) []File {
 
 		// get files recursively
 		if file.IsDir() {
-			filesInSubDir := getTextFilesInDirectory(dirpath+file.Name()+"/", ".txt")
+			filesInSubDir := getFilesInDirectory(dirpath+file.Name()+"/", ".txt")
 			textFiles = append(textFiles, filesInSubDir...)
 		}
 	}
@@ -105,7 +116,7 @@ func getTextFilesInDirectory(dirpath string, extension string) []File {
 }
 
 // Take a file path and save that file's contents as a new html post
-func generatePageFromFile(dirpath string, filename string, extension string) {
+func generatePageFromFile(dirpath string, filename string, extension string) Page {
 	// Check if parent directory exists at output dirpath yet
 	fileContents, err := ioutil.ReadFile(dirpath + filename + extension)
 	if err != nil {
@@ -136,9 +147,33 @@ func generatePageFromFile(dirpath string, filename string, extension string) {
 	// Furthermore, upon execution, the rendered template will be
 	// saved inside the new file we created earlier.
 	t.Execute(newFile, page)
+	incrementStatCounter(*newFile)
 
+	return page
+}
+
+func generateHomePage(pages []Page, title string) {
+	homePage := PageList{
+		HTMLPagePath: "./output/index.html",
+		Title:        title,
+		Pages:        pages,
+	}
+
+	// Create a new, blank HTML file.
+	newFile, err := os.Create(homePage.HTMLPagePath)
+	if err != nil {
+		panic(err)
+	}
+
+	t := template.Must(template.New("home.tmpl").ParseFiles("home.tmpl"))
+	t.Execute(newFile, homePage)
+
+	incrementStatCounter(*newFile)
+}
+
+func incrementStatCounter(file os.File) {
 	// Get size of new file
-	fileStat, err := newFile.Stat()
+	fileStat, err := file.Stat()
 	if err != nil {
 		panic(err)
 	}
