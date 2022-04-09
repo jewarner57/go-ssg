@@ -41,17 +41,20 @@ var bytesGenerated int64 = 0
 
 func main() {
 	filename := flag.String("file", "", "Name of a text file in the current directory.")
-	dirpath := flag.String("dir", "./", "A path to a directory containing text files.")
-	templateDir := flag.String("templateDir", "./templates/", "A path to a directory containing template files")
-	outputDir := flag.String("outputDir", "./output/", "A path to the desired output directory")
+	dirpath := flag.String("dir", "./", "A path to a directory containing text files. Defaults to ./")
+	templateDir := flag.String("templateDir", "./templates/", "A path to a directory containing template files. Defaults to ./templates/")
+	outputDir := flag.String("outputDir", "./output/", "A path to the desired output directory. Defaults to ./output/")
+	fileExtension := flag.String("ext", ".md", "The extension of files to be parsed. defaults to .md")
 	flag.Parse()
 
+	createDirectoryIfDoesNotExist(*outputDir)
+
 	if *filename != "" {
-		generatePageFromFile("./", *filename, ".md", *templateDir, *outputDir)
+		generatePageFromFile("./", *filename, *fileExtension, *templateDir, *outputDir)
 		return
 	}
 
-	generateSiteFromDir(*dirpath, *templateDir, *outputDir)
+	generateSiteFromDir(*dirpath, *templateDir, *outputDir, *fileExtension)
 	printSuccessMessage()
 }
 
@@ -73,8 +76,20 @@ func printSuccessMessage() {
 	white.Print(banner + " \n")
 }
 
-func generateSiteFromDir(dirpath string, templatePath string, outputDir string) {
-	textFilesInDir := getFilesInDirectory(dirpath, ".md")
+func createDirectoryIfDoesNotExist(path string) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return
+	}
+
+	create_err := os.Mkdir(path, 0755)
+	if create_err != nil {
+		panic(create_err)
+	}
+}
+
+func generateSiteFromDir(dirpath string, templatePath string, outputDir string, ext string) {
+	textFilesInDir := getFilesInDirectory(dirpath, ext)
 	var pages []Page
 
 	for _, file := range textFilesInDir {
@@ -110,7 +125,7 @@ func getFilesInDirectory(dirpath string, extension string) []File {
 
 		// get files recursively
 		if file.IsDir() {
-			filesInSubDir := getFilesInDirectory(dirpath+file.Name()+"/", ".md")
+			filesInSubDir := getFilesInDirectory(dirpath+file.Name()+"/", extension)
 			textFiles = append(textFiles, filesInSubDir...)
 		}
 	}
