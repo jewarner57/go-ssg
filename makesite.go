@@ -3,15 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"text/template"
 
 	"github.com/fatih/color"
+	"github.com/gomarkdown/markdown"
 )
 
 // Page holds all the information we need to generate a new
@@ -41,14 +42,16 @@ var bytesGenerated int64 = 0
 func main() {
 	filename := flag.String("file", "", "Name of a text file in the current directory.")
 	dirpath := flag.String("dir", "./", "A path to a directory containing text files.")
+	templateDir := flag.String("templateDir", "./templates/", "A path to a directory containing template files")
+	outputDir := flag.String("outputDir", "./output/", "A path to the desired output directory")
 	flag.Parse()
 
 	if *filename != "" {
-		generatePageFromFile("./", *filename, ".txt")
+		generatePageFromFile("./", *filename, ".md", *templateDir, *outputDir)
 		return
 	}
 
-	generateSiteFromDir(*dirpath)
+	generateSiteFromDir(*dirpath, *templateDir, *outputDir)
 	printSuccessMessage()
 }
 
@@ -70,17 +73,17 @@ func printSuccessMessage() {
 	white.Print(banner + " \n")
 }
 
-func generateSiteFromDir(dirpath string) {
-	textFilesInDir := getFilesInDirectory(dirpath, ".txt")
+func generateSiteFromDir(dirpath string, templatePath string, outputDir string) {
+	textFilesInDir := getFilesInDirectory(dirpath, ".md")
 	var pages []Page
 
 	for _, file := range textFilesInDir {
 		pages = append(
 			pages,
-			generatePageFromFile(file.DirPath, file.FileName, ""),
+			generatePageFromFile(file.DirPath, file.FileName, "", templatePath, outputDir),
 		)
 	}
-	generateHomePage(pages, "Home")
+	generateHomePage(pages, "Home", templatePath, outputDir)
 }
 
 func getFilesInDirectory(dirpath string, extension string) []File {
@@ -107,7 +110,7 @@ func getFilesInDirectory(dirpath string, extension string) []File {
 
 		// get files recursively
 		if file.IsDir() {
-			filesInSubDir := getFilesInDirectory(dirpath+file.Name()+"/", ".txt")
+			filesInSubDir := getFilesInDirectory(dirpath+file.Name()+"/", ".md")
 			textFiles = append(textFiles, filesInSubDir...)
 		}
 	}
@@ -116,25 +119,33 @@ func getFilesInDirectory(dirpath string, extension string) []File {
 }
 
 // Take a file path and save that file's contents as a new html post
-func generatePageFromFile(dirpath string, filename string, extension string) Page {
+func generatePageFromFile(
+	dirpath string,
+	filename string,
+	extension string,
+	templateDir string,
+	outputDir string,
+) Page {
 	// Check if parent directory exists at output dirpath yet
 	fileContents, err := ioutil.ReadFile(dirpath + filename + extension)
 	if err != nil {
 		panic(err)
 	}
-	outputFilePath := "./output/" + filename + ".html"
+
+	output := markdown.ToHTML(fileContents, nil, nil)
+	outputFilePath := outputDir + filename + ".html"
 
 	page := Page{
 		TextFilePath: "./first-post",
 		TextFileName: filename,
 		HTMLPagePath: outputFilePath,
-		Content:      string(fileContents),
+		Content:      string(output),
 	}
 
 	// Create a new template in memory named "template.tmpl".
 	// When the template is executed, it will parse template.tmpl,
 	// looking for {{ }} where we can inject content.
-	t := template.Must(template.New("template.tmpl").ParseFiles("template.tmpl"))
+	t := template.Must(template.New("template.tmpl").ParseFiles(templateDir + "template.tmpl"))
 
 	// Create a new, blank HTML file.
 	newFile, err := os.Create(page.HTMLPagePath)
@@ -152,9 +163,9 @@ func generatePageFromFile(dirpath string, filename string, extension string) Pag
 	return page
 }
 
-func generateHomePage(pages []Page, title string) {
+func generateHomePage(pages []Page, title string, templateDir string, outputDir string) {
 	homePage := PageList{
-		HTMLPagePath: "./output/index.html",
+		HTMLPagePath: (outputDir + "index.html"),
 		Title:        title,
 		Pages:        pages,
 	}
@@ -165,7 +176,7 @@ func generateHomePage(pages []Page, title string) {
 		panic(err)
 	}
 
-	t := template.Must(template.New("home.tmpl").ParseFiles("home.tmpl"))
+	t := template.Must(template.New("home.tmpl").ParseFiles(templateDir + "home.tmpl"))
 	t.Execute(newFile, homePage)
 
 	incrementStatCounter(*newFile)
