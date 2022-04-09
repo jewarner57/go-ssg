@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>./md-output/notes_11-18.md.html</title>
+  </head>
+  <body>
+    <h2>
+      notes_11-18.md
+    </h2>
+    <p>
+      <h2>React Pt. 2</h2>
+
+<h3>React Virtual Dom</h3>
+
+<ul>
+<li><p>the react DOM keeps a representation of the view</p></li>
+
+<li><p>react DOM only updates when there is a difference to be rendered</p>
+
+<ul>
+<li>it only updates the parts that have changed NOT the entire DOM</li>
+</ul></li>
+
+<li><p>When using react you should not use querySelector()</p>
+
+<ul>
+<li>elements may be overwritten when the virtual DOM does an update</li>
+</ul></li>
+
+<li><p>Don&rsquo;t directly change update or edit DOM nodes directly with properties like innterHTML</p></li>
+
+<li><p>Always make UI changes through a component</p></li>
+</ul>
+
+<h3>Collections in React</h3>
+
+<ul>
+<li><p>A data structure that collects any group of values together</p>
+
+<ul>
+<li>Arrays and objects</li>
+</ul></li>
+
+<li><p>In React a collection might be a list of components</p></li>
+
+<li><p>React will automatically render all items in an array.</p></li>
+
+<li><p>Make sure each element in the array has a unique key property:
+<code>javascript
+const headings = [
+    &lt;div key=&quot;1&quot;&gt;1&lt;/div&gt;
+    &lt;div key=&quot;2&quot;&gt;2&lt;/div&gt;
+    &lt;div key=&quot;3&quot;&gt;3&lt;/div&gt;
+]
+//renders all 3 divs
+render({headings})
+</code></p></li>
+
+<li><p>The virtual dom needs keys on each item in a list so it can figure out what has changed abd only update that specific item</p></li>
+
+<li></li>
+</ul>
+
+    </p>
+  </body>
+
+  <style>
+    body {
+      padding: 20px;
+    }
+  </style>
+</html>

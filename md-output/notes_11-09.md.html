@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>./md-output/notes_11-09.md.html</title>
+  </head>
+  <body>
+    <h2>
+      notes_11-09.md
+    </h2>
+    <p>
+      <h2>OOP Inheritance</h2>
+
+<h3>Inheritance In JS</h3>
+
+<pre><code class="language-javascript">
+class Sprite() {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+  }
+}
+
+class Ball extends Sprite {
+  constructor(x, y, color, radius) {
+
+    // super calls the parent class's constructor
+    super(x, y, color);
+
+    this.radius = radius;
+  }
+}
+
+</code></pre>
+
+<h3>REPL - <a href="https://repl.it/@JonathanWarner2/top-canvas-inheritance">https://repl.it/@JonathanWarner2/top-canvas-inheritance</a></h3>
+
+    </p>
+  </body>
+
+  <style>
+    body {
+      padding: 20px;
+    }
+  </style>
+</html>

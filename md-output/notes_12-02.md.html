@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>./md-output/notes_12-02.md.html</title>
+  </head>
+  <body>
+    <h2>
+      notes_12-02.md
+    </h2>
+    <p>
+      <h2>Publishing and Building</h2>
+
+<h3>npm run build</h3>
+
+<ul>
+<li>creates a build folder with all required files for the complete project
+
+<ul>
+<li>build folder can be deployed to github pages</li>
+</ul></li>
+</ul>
+
+<h3>Steps to deploying on github pages</h3>
+
+<ul>
+<li><p>Run: npm run build</p></li>
+
+<li><p>Run: npm install gh-pages &ndash;save-dev</p></li>
+
+<li><p>Add this to your package.json:</p>
+
+<ul>
+<li>&ldquo;homepage&rdquo;: &ldquo;https://<username>.github.io/<repo-name>&rdquo;</li>
+</ul></li>
+
+<li><p>Also in your package.json:</p>
+
+<ul>
+<li>Add this to your list of scripts:</li>
+<li>&ldquo;predeploy&rdquo;: &ldquo;npm run build&rdquo;,</li>
+<li>&ldquo;deploy&rdquo;: &ldquo;gh-pages -d build&rdquo;</li>
+</ul></li>
+
+<li><p>Commit and push your work</p></li>
+
+<li><p>Run: npm run deploy</p>
+
+<ul>
+<li>it should automatically create a new branch and add your </li>
+</ul></li>
+</ul>
+
+    </p>
+  </body>
+
+  <style>
+    body {
+      padding: 20px;
+    }
+  </style>
+</html>

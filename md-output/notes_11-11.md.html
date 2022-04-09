@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>./md-output/notes_11-11.md.html</title>
+  </head>
+  <body>
+    <h2>
+      notes_11-11.md
+    </h2>
+    <p>
+      <h2>Bundling</h2>
+
+<h3>What is bundling?</h3>
+
+<ul>
+<li>compressing and processing our code into <strong>one</strong> file.</li>
+</ul>
+
+<h3>Minify</h3>
+
+<ul>
+<li>removes all spaces and line breaks</li>
+<li>also removes comments</li>
+</ul>
+
+<h3>Uglify</h3>
+
+<ul>
+<li>renames elements, obfuscates code and reduces file size</li>
+<li>might rename a variable to a or b</li>
+</ul>
+
+<h3>Compatibility</h3>
+
+<ul>
+<li>converts ES6 into older javascript that is compatible with older browser</li>
+</ul>
+
+<h3>Why bundle?</h3>
+
+<ul>
+<li>makes smaller and fewer files to make websites load faster.</li>
+</ul>
+
+<hr>
+
+<h3>Bundling with Webpack</h3>
+
+<ul>
+<li><p>install webpack with npm</p></li>
+
+<li><p>create a src and a dist folder</p></li>
+
+<li><p>put your js into the src and your html into dist</p></li>
+
+<li><p>create your webpack.config.js example:</p>
+
+<pre><code class="language-javascript">const path = require('path')
+
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+  filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist')
+  }
+}
+</code></pre></li>
+
+<li><p>Add webpack scripts in your package.json</p>
+
+<ul>
+<li>Build is for production, develop is for dev
+
+<ul>
+<li>use npm run build/develop
+<code>json
+&quot;scripts&quot;: {
+&quot;develop&quot;: &quot;webpack --mode development --watch&quot;,
+&quot;build&quot;: &quot;webpack --mode production&quot;
+},
+</code></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h3>_</h3>
+
+    </p>
+  </body>
+
+  <style>
+    body {
+      padding: 20px;
+    }
+  </style>
+</html>
