@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/gomarkdown/markdown"
@@ -40,6 +41,14 @@ var generatedFilesCount int = 0
 var bytesGenerated int64 = 0
 
 func main() {
+	startTime := time.Now()
+	endTime := generateSite()
+	timeDiff := endTime.Sub(startTime).Seconds()
+
+	printSuccessMessage(timeDiff)
+}
+
+func generateSite() time.Time {
 	filename := flag.String("file", "", "Name of a text file in the current directory.")
 	dirpath := flag.String("dir", "./", "A path to a directory containing text files. Defaults to ./")
 	templateDir := flag.String("templateDir", "./templates/", "A path to a directory containing template files. Defaults to ./templates/")
@@ -51,28 +60,37 @@ func main() {
 
 	if *filename != "" {
 		generatePageFromFile("./", *filename, *fileExtension, *templateDir, *outputDir)
-		return
+		return time.Now()
 	}
 
 	generateSiteFromDir(*dirpath, *templateDir, *outputDir, *fileExtension)
-	printSuccessMessage()
+	return time.Now()
 }
 
-func printSuccessMessage() {
+func printSuccessMessage(timeDiff float64) {
 	white := color.New(color.FgWhite)
 	green := color.New(color.FgGreen)
 	boldGreen := green.Add(color.Bold)
 
-	outputSize := fmt.Sprintf("(%.1fkB) total.", float64(bytesGenerated)/1000)
+	outputSize := fmt.Sprintf("%.1fkB", float64(bytesGenerated)/1000)
+	timeString := fmt.Sprintf("%.2fs.", float64(timeDiff)/1000)
 
 	// generate size for banner by generatedFilesCount char length
-	banner := strings.Repeat("-", 29+len(strconv.Itoa(generatedFilesCount))+len(outputSize))
+	countTextSize := len(strconv.Itoa(generatedFilesCount))
+	sizeTextSize := len(outputSize)
+	timeDiffSize := len(timeString)
+
+	banner := strings.Repeat("-", 40+countTextSize+sizeTextSize+timeDiffSize)
 
 	white.Print(banner + " \n")
+
 	boldGreen.Print(" Success! ")
 	fmt.Print("Generated ")
 	boldGreen.Printf("%d ", generatedFilesCount)
-	fmt.Printf("pages " + outputSize + "\n")
+	fmt.Printf("pages (")
+	boldGreen.Printf(outputSize)
+	fmt.Printf(" total) in ")
+	boldGreen.Printf(timeString + " \n")
 	white.Print(banner + " \n")
 }
 
